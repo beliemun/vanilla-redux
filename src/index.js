@@ -1,4 +1,3 @@
-import { getNodeText } from "@testing-library/react";
 import { createStore } from "redux";
 
 const form = document.querySelector("form");
@@ -12,30 +11,37 @@ const reducer = (state = [], action) => {
     console.log(action);
     switch (action.type) {
         case ADD_TODO:
-            return [...state, { text: action.text, id: Date.now() }];
+            return [{ text: action.text, id: Date.now() }, ...state];
         case DELETE_TODO:
-            return state.filter(toDo => toDo.id !== action.id);
+            return state.filter(toDo => {
+                return toDo.id !== action.id
+            });
         default:
             return state;
     }
 }
 
 const addTodo = text => {
-    return { type: ADD_TODO, text };
+    return {
+        type: ADD_TODO,
+        text
+    };
 }
 
 const deleteTodo = id => {
-    return { type: DELETE_TODO, id };
+    return {
+        type: DELETE_TODO,
+        id
+    };
 }
 
 const dispatchAddTodo = text => {
-    console.log("dispatchAddTodo()");
     store.dispatch(addTodo(text));
 }
 
 const dispathchDeleteTodo = event => {
-    console.log("dispathchDeleteTodo()");
-    // store.dispatch(deleteTodo(id));
+    const id = parseInt(event.target.parentNode.id);
+    store.dispatch(deleteTodo(id));
 }
 
 const renderToDoList = () => {
@@ -44,7 +50,7 @@ const renderToDoList = () => {
     toDos.forEach(toDo => {
         const li = document.createElement("li");
         const btn = document.createElement("button");
-        btn.addEventListener("click", dispathchDeleteTodo());
+        btn.addEventListener("click", dispathchDeleteTodo);
         btn.innerText = "DEL";
         li.id = toDo.id;
         li.innerText = toDo.text;
@@ -57,7 +63,6 @@ const store = createStore(reducer);
 store.subscribe(renderToDoList);
 
 const onSubmit = (event) => {
-    console.log(event);
     event.preventDefault();
     dispatchAddTodo(input.value);
     input.value = "";
