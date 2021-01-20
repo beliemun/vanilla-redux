@@ -1,35 +1,70 @@
+import { getNodeText } from "@testing-library/react";
 import { createStore } from "redux";
 
-const PLUS = "PLUS";
-const MINUS = "MINUS"
+const form = document.querySelector("form");
+const input = document.querySelector("input");
+const ul = document.querySelector("ul");
 
-const countReducer = (count = 0, action) => {
+const ADD_TODO = "ADD_TODO";
+const DELETE_TODO = "DELETE_TODO";
+
+const reducer = (state = [], action) => {
+    console.log(action);
     switch (action.type) {
-        case PLUS:
-            return count + 1;
-        case MINUS:
-            return count - 1;
+        case ADD_TODO:
+            return [...state, { text: action.text, id: Date.now() }];
+        case DELETE_TODO:
+            return state.filter(toDo => toDo.id !== action.id);
         default:
-            return count;
+            return state;
     }
 }
 
-const countStore = createStore(countReducer);
-
-const onChange = () => {
-    countSpan.innerHTML = countStore.getState();
+const addTodo = text => {
+    return { type: ADD_TODO, text };
 }
 
-countStore.subscribe(onChange);
+const deleteTodo = id => {
+    return { type: DELETE_TODO, id };
+}
 
-const plusButton = document.getElementById("plus");
-const minusButton = document.getElementById("minus");
-const countSpan = document.getElementById("count");
+const dispatchAddTodo = text => {
+    console.log("dispatchAddTodo()");
+    store.dispatch(addTodo(text));
+}
+
+const dispathchDeleteTodo = event => {
+    console.log("dispathchDeleteTodo()");
+    // store.dispatch(deleteTodo(id));
+}
+
+const renderToDoList = () => {
+    ul.innerHTML = "";
+    const toDos = store.getState();
+    toDos.forEach(toDo => {
+        const li = document.createElement("li");
+        const btn = document.createElement("button");
+        btn.addEventListener("click", dispathchDeleteTodo());
+        btn.innerText = "DEL";
+        li.id = toDo.id;
+        li.innerText = toDo.text;
+        li.appendChild(btn);
+        ul.appendChild(li);
+    })
+}
+
+const store = createStore(reducer);
+store.subscribe(renderToDoList);
+
+const onSubmit = (event) => {
+    console.log(event);
+    event.preventDefault();
+    dispatchAddTodo(input.value);
+    input.value = "";
+}
 
 const init = () => {
-    countSpan.innerHTML = countStore.getState();
-    plusButton.addEventListener("click", () => countStore.dispatch({ type: PLUS }));
-    minusButton.addEventListener("click", () => countStore.dispatch({ type: MINUS }));
+    form.addEventListener("submit", onSubmit);
 }
 
 init();
