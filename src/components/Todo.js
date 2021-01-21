@@ -2,9 +2,9 @@ import React from "react";
 import { connect } from "react-redux";
 import { actionCreators } from "../store";
 
-const Todo = ({ text, id, deleteTodo }, key) => {
+const Todo = ({ text, id, deleteTodo }) => {
     return (
-        <li id={id} key={key}>
+        <li id={id}>
             {text} <button onClick={deleteTodo}>DEL</button>
         </li>
     );
